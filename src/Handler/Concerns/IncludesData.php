@@ -72,7 +72,7 @@ trait IncludesData
                 throw new BadRequestException("Invalid include [{$path}{$name}]", 'include');
             }
 
-            if ($type = $fields[$name]->getType()) {
+            if (($type = $fields[$name]->getType()) && is_string($type)) {
                 $relatedResource = $this->api->getResource($type);
 
                 $this->validateInclude($relatedResource, $nested, $name.'.');
