@@ -15,6 +15,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use InvalidArgumentException;
 use Tobyz\JsonApiServer\Schema\Attribute;
 use Tobyz\JsonApiServer\Schema\HasMany;
@@ -176,8 +177,9 @@ class EloquentAdapter implements AdapterInterface
     public function filterByHasOne($query, HasOne $relationship, array $ids): void
     {
         $relation = $this->getEloquentRelation($query->getModel(), $relationship);
+        $column = $relation instanceof HasOneThrough ? $relation->getQualifiedParentKeyName() : $relation->getQualifiedForeignKeyName();
 
-        $query->whereIn($relation->getQualifiedForeignKeyName(), $ids);
+        $query->whereIn($column, $ids);
     }
 
     public function filterByHasMany($query, HasMany $relationship, array $ids): void
