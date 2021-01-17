@@ -19,6 +19,7 @@ use JsonApiPhp\JsonApi\Link\PrevLink;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface;
+use Tobyz\JsonApiServer\Context;
 use Tobyz\JsonApiServer\Exception\BadRequestException;
 use Tobyz\JsonApiServer\JsonApi;
 use Tobyz\JsonApiServer\JsonApiResponse;
@@ -75,6 +76,14 @@ class Index implements RequestHandlerInterface
         foreach ($models as $model) {
             $serializer->add($this->resource, $model, $include);
         }
+        
+        $context = new Context;
+        $context->query = $query;
+        $documentMeta = [];
+
+        foreach ($schema->getDocumentMeta() as $key => $value) {
+            $documentMeta[] = new Structure\Meta($key, $value($context));
+        }
 
         return new JsonApiResponse(
             new Structure\CompoundDocument(
@@ -86,7 +95,8 @@ class Index implements RequestHandlerInterface
                 new Structure\Link\SelfLink($this->buildUrl($request)),
                 new Structure\Meta('offset', $offset),
                 new Structure\Meta('limit', $limit),
-                ...($total !== null ? [new Structure\Meta('total', $total)] : [])
+                ...($total !== null ? [new Structure\Meta('total', $total)] : []),
+                ...$documentMeta
             )
         );
     }

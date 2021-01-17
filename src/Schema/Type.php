@@ -35,6 +35,7 @@ final class Type
     private $updatable = false;
     private $deletable = false;
     private $deleteCallback;
+    private $documentMeta = [];
 
     /**
      * Set the description of the type for documentation generation.
@@ -482,5 +483,15 @@ final class Type
     public function getDefaultFilter(): ?array
     {
         return $this->defaultFilter;
+    }
+
+    public function documentMeta($key, $value)
+    {
+        $this->documentMeta[$key] = $value;
+    }
+
+    public function getDocumentMeta()
+    {
+        return $this->documentMeta;
     }
 }
